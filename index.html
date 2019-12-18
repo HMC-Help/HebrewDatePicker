@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>jQuery UI Datepicker - Default functionality</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+  <script>
+  $( function() {
+    $( "#datepicker" ).datepicker({
+		onChangeMonthYear: function(month, year, dp) {
+			updateDatePickerCells(dp);
+		},
+		beforeShow: function(elem, dp) {
+			updateDatePickerCells(dp);
+		}
+	});
+  });
+  
+  function updateDatePickerCells(dp) {
+	if(dp.selectedYear==0){
+		dp.selectedYear = new Date().getFullYear();
+		dp.selectedMonth = new Date().getMonth();
+	}
+	var url = 'https://www.hebcal.com/hebcal/?v=1&cfg=json&d=on&year=' + dp.selectedYear + '&month=' + (dp.selectedMonth+1);
+	$.get(url, function (data) {
+		$('.ui-datepicker td > *').each(function (idx, elem) {
+			var d = GetHebDate(data.items[idx].hebrew);
+			$(this).attr('data-content', d);
+		});
+	});
+   }
+   
+   function GetHebDate(inDate){
+	var HebDay = inDate.split(" ")[0];
+	var HebMo = inDate.split(" ")[1];
+	if(HebMo.substring(0,1)=='ב')
+		HebMo= HebMo.substring(1,100);
+	return HebDay + " " + HebMo;
+   }
+  </script>
+  <style >
+.ui-datepicker td > *:after {
+    content: attr(data-content);
+    display: block;
+    text-align: center;
+    /* color: Blue; */
+    font-size: 11px;
+    font-weight: bold;
+    height: 24px;
+}
+.ui-datepicker td span, .ui-datepicker td a {
+    text-align: center;
+}
+  </style>
+</head>
+<body>
+ 
+<p>Date: <input type="text" id="datepicker" autocomplete="off"></p>
+ 
+ 
+</body>
+</html>
